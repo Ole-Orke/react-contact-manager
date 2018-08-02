@@ -15,7 +15,7 @@ mongoose.connect(process.env.MONGODB_URI, {useNewUrlParser: true}, (error) => {
   }
 });
 
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
 app.get('/ping', function (req, res) {
  return res.send('pong');
@@ -47,6 +47,23 @@ app.post("/api/addContact", (req, res) => {
       error: "Missing parameters"
     });
   }
+});
+
+app.get("/api/getContacts", (req, res) => {
+  Contact.find((error, contacts) => {
+    if(error) {
+      console.log(error);
+      res.status(500).json({
+        error: "Could not retrieve contacts"
+      });
+    }
+    else {
+      res.status(200).json({
+        success: true,
+        contacts: contacts
+      });
+    }
+  });
 });
 
 // DO NOT REMOVE THIS LINE :)

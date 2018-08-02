@@ -11,6 +11,25 @@ class ContactList extends Component {
     }
   }
 
+  inputNameChange(event) {
+    this.setState({
+      inputName: event.target.value
+    });
+  }
+
+  inputPhoneChange(event) {
+    console.log(parseInt(event.target.value));
+    if(!isNaN(parseInt(event.target.value))) {
+      this.setState({
+        inputPhone: event.target.value
+      });
+    }
+  }
+
+  componentDidMount(){
+    
+  }
+
   render() {
     const contactListStyle = {
       marginTop: "20px",
@@ -53,13 +72,13 @@ class ContactList extends Component {
             <tr>
               <td>
                 <div className="form-group">
-                  <input type="text" value={this.state.inputName} className="form-control">
+                  <input type="text" onChange={(event) => this.inputNameChange(event)} value={this.state.inputName} className="form-control">
                   </input>
                 </div>
               </td>
               <td>
                 <div className="form-group">
-                  <input type="number" value={this.state.inputPhone} className="form-control">
+                  <input type="text" onChange={(event) => this.inputPhoneChange(event)} value={this.state.inputPhone} className="form-control">
                   </input>
                 </div>
               </td>
