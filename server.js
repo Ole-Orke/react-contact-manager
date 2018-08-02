@@ -83,6 +83,25 @@ app.post("/api/deleteContact", (req, res) => {
   });
 });
 
+app.post("/api/editContact", (req, res) => {
+  const id = req.body.id;
+  const name = req.body.name;
+  const phone = req.body.phone;
+  Contact.findByIdAndUpdate(id, {name: name, phone: phone}, (error) => {
+    if(error) {
+      console.log(error);
+      res.status(400).json({
+        error: "Failed to update contact"
+      });
+    }
+    else {
+      res.status(200).json({
+        success: true
+      });
+    }
+  });
+});
+
 // DO NOT REMOVE THIS LINE :)
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));

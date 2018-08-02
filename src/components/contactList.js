@@ -5,14 +5,18 @@ class ContactList extends Component {
     super(props);
     this.state = {
       contacts: [],
+      displayContacts: [],
       inputName: "",
-      inputPhone: ""
+      inputPhone: "",
+      editing: false,
+      editId: "",
+      inputSearch: ""
     }
   }
 
   inputNameChange(event) {
     this.setState({
-      inputName: event.target.value
+      inputName: event.target.value,
     });
   }
 
@@ -27,6 +31,18 @@ class ContactList extends Component {
         inputPhone: ""
       });
     }
+  }
+
+  inputSearchChange(event) {
+    let contacts = this.state.contacts;
+    let search = event.target.value;
+    contacts = contacts.filter((contact) => {
+      return (contact.name.toLowerCase().indexOf(search) !== -1);
+    });
+    this.setState({
+      displayContacts: contacts,
+      inputSearch: event.target.value,
+    });
   }
 
   getContacts() {
@@ -50,7 +66,8 @@ class ContactList extends Component {
       }
       else {
         this.setState({
-          contacts: resp.contacts
+          contacts: resp.contacts,
+          displayContacts: resp.contacts
         });
       }
     })
@@ -94,6 +111,7 @@ class ContactList extends Component {
     .catch((err) => {
       console.log(err);
     });
+    this.getContacts();
   }
 
   deleteContact(event) {
@@ -121,6 +139,60 @@ class ContactList extends Component {
     });
   }
 
+  startEdit(event) {
+    const arr = event.target.value.split("/");
+    console.log(arr);
+    const name = arr[0];
+    const phone = arr[1];
+    const id = arr[2];
+    this.setState({
+      inputName: name,
+      inputPhone: phone,
+      editing: true,
+      editId: id
+    });
+  }
+
+  stopEdit() {
+    this.setState({
+      editing: false,
+      inputName: "",
+      inputPhone: ""
+    });
+  }
+
+  editContact() {
+    fetch('/api/editContact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: this.state.inputName,
+        phone: this.state.inputPhone,
+        id: this.state.editId
+      }),
+    })
+    .then((res) => res.json())
+    .then((resp) => {
+      if(resp.success) {
+        console.log("Contact edited");
+        this.getContacts();
+        this.setState({
+          editing: false,
+          inputName: "",
+          inputPhone: ""
+        });
+      }
+      else {
+        console.log(resp.error);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
+
   render() {
     const contactListStyle = {
       marginTop: "20px",
@@ -130,12 +202,22 @@ class ContactList extends Component {
       fontSize: "20px"
     };
     const tableStyle = {
-      width: "80%"
+      width: "80%",
+      justifyContent: "center",
     }
     return (
       <div style={contactListStyle}>
         <table style={tableStyle} className="table">
           <thead>
+            <tr>
+              <td>
+                <span className="form-group">
+                  Search:
+                  <input onChange={(event) => this.inputSearchChange(event)} value={this.state.inputSearch} className="form-control">
+                  </input>
+                </span>
+              </td>
+            </tr>
             <tr>
               <th>
                 Name
@@ -148,7 +230,7 @@ class ContactList extends Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.contacts.map((contact) => <tr key={contact.name + contact.number}>
+            {this.state.displayContacts.map((contact) => <tr key={contact._id}>
               <td>
                 {contact.name}
               </td>
@@ -156,7 +238,7 @@ class ContactList extends Component {
                 {contact.phone}
               </td>
               <td>
-                <button value={contact.name} className="btn btn-dark">Edit</button>
+                <button value={contact.name + "/" + contact.phone + "/" + contact._id} onClick={(event) => this.startEdit(event)} className="btn btn-dark">Edit</button>
                 <button onClick={(event) => this.deleteContact(event)} value={contact.name} className="btn btn-danger">Delete</button>
               </td>
             </tr>)}
@@ -174,7 +256,7 @@ class ContactList extends Component {
                 </div>
               </td>
               <td>
-                <button onClick={() => this.addContact()} className="btn btn-primary">Add contact</button>
+                {this.state.editing ? <div><button onClick={() => this.editContact()} className="btn btn-primary">Edit</button><button onClick={() => this.stopEdit()} className="btn btn-danger">Cancel</button></div> : <button onClick={() => this.addContact()} className="btn btn-primary">Add contact</button>}
               </td>
             </tr>
           </tbody>
