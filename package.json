@@ -5,6 +5,7 @@
   "proxy": "http://localhost:1337",
   "dependencies": {
     "express": "^4.16.3",
+    "mongoose": "^5.2.6",
     "nodemon": "^1.18.3",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",

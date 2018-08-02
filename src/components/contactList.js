@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+const dummyData = [{name: "Bob Dylan", phone: 123232}, {name: "Mila Kunis", phone: 4343434}, {name: "Bob Ross", phone: 33333}];
 
 class ContactList extends Component {
   constructor(props){
     super(props);
     this.state = {
-      contacts: dummyData
+      contacts: dummyData,
+      inputName: "",
+      inputPhone: undefined
     }
   }
 
@@ -50,13 +53,13 @@ class ContactList extends Component {
             <tr>
               <td>
                 <div className="form-group">
-                  <input type="text" className="form-control">
+                  <input type="text" value={this.state.inputName} className="form-control">
                   </input>
                 </div>
               </td>
               <td>
                 <div className="form-group">
-                  <input type="text" className="form-control">
+                  <input type="number" value={this.state.inputPhone} className="form-control">
                   </input>
                 </div>
               </td>
@@ -70,3 +73,5 @@ class ContactList extends Component {
     )
   }
 }
+
+export default ContactList;
