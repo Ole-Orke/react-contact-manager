@@ -1,0 +1,22 @@
+{
+  "name": "contact-manager",
+  "version": "0.1.0",
+  "private": true,
+  "proxy": "http://localhost:1337",
+  "dependencies": {
+    "express": "^4.16.3",
+    "nodemon": "^1.18.3",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "react-scripts": "1.1.4"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "react": "react-scripts start",
+    "dev": "npm run server | react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
