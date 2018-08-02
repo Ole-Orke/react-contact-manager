@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-const dummyData = [{name: "Bob Dylan", phone: 123232}, {name: "Mila Kunis", phone: 4343434}, {name: "Bob Ross", phone: 33333}];
 
 class ContactList extends Component {
   constructor(props){
     super(props);
     this.state = {
-      contacts: dummyData,
+      contacts: [],
       inputName: "",
-      inputPhone: undefined
+      inputPhone: ""
     }
   }
 
@@ -18,16 +17,108 @@ class ContactList extends Component {
   }
 
   inputPhoneChange(event) {
-    console.log(parseInt(event.target.value));
-    if(!isNaN(parseInt(event.target.value))) {
+    if(parseInt(event.target.value)) {
       this.setState({
         inputPhone: event.target.value
       });
     }
+    else {
+      this.setState({
+        inputPhone: ""
+      });
+    }
+  }
+
+  getContacts() {
+    fetch('/api/getContacts', {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then((res)=> {
+      if(res.status === 200) {
+        return res.json();
+      } else {
+        console.log("Erro GETting contacts");
+        return res.json();
+      }
+    })
+    .then((resp) => {
+      if (resp.error) {
+        console.log(resp.error);
+      }
+      else {
+        this.setState({
+          contacts: resp.contacts
+        });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
   }
 
   componentDidMount(){
-    
+    this.getContacts();
+  }
+
+  addContact() {
+    fetch('/api/addContact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: this.state.inputName,
+        phone: this.state.inputPhone,
+      }),
+    })
+    .then((res) => res.json())
+    .then((resp) => {
+      if(resp.success) {
+        console.log("Contact added!");
+        this.setState({
+          contacts: this.state.contacts.concat({
+            name: this.state.inputName,
+            phone: this.state.inputPhone
+          }),
+          inputName: "",
+          inputPhone: ""
+        });
+      }
+      else {
+        console.log(resp.error);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
+
+  deleteContact(event) {
+    fetch('/api/deleteContact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: event.target.value
+      }),
+    })
+    .then((res) => res.json())
+    .then((resp) => {
+      if(resp.success) {
+        console.log("Contact deleted!");
+        this.getContacts();
+      }
+      else {
+        console.log(resp.error);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
   }
 
   render() {
@@ -65,25 +156,25 @@ class ContactList extends Component {
                 {contact.phone}
               </td>
               <td>
-                <button className="btn btn-dark">Edit</button>
-                <button className="btn btn-danger">Delete</button>
+                <button value={contact.name} className="btn btn-dark">Edit</button>
+                <button onClick={(event) => this.deleteContact(event)} value={contact.name} className="btn btn-danger">Delete</button>
               </td>
             </tr>)}
             <tr>
               <td>
                 <div className="form-group">
-                  <input type="text" onChange={(event) => this.inputNameChange(event)} value={this.state.inputName} className="form-control">
+                  <input onChange={(event) => this.inputNameChange(event)} value={this.state.inputName} className="form-control">
                   </input>
                 </div>
               </td>
               <td>
                 <div className="form-group">
-                  <input type="text" onChange={(event) => this.inputPhoneChange(event)} value={this.state.inputPhone} className="form-control">
+                  <input onChange={(event) => this.inputPhoneChange(event)} value={this.state.inputPhone} className="form-control">
                   </input>
                 </div>
               </td>
               <td>
-                <button className="btn btn-primary">Add contact</button>
+                <button onClick={() => this.addContact()} className="btn btn-primary">Add contact</button>
               </td>
             </tr>
           </tbody>

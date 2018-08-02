@@ -66,6 +66,23 @@ app.get("/api/getContacts", (req, res) => {
   });
 });
 
+app.post("/api/deleteContact", (req, res) => {
+  const name = req.body.name;
+  Contact.findOneAndRemove({name: name}, (error) => {
+    if (error) {
+      console.log(error);
+      res.status(500).json({
+        error: "Could not delete contact"
+      });
+    }
+    else {
+      res.status(200).json({
+        success: true
+      });
+    }
+  });
+});
+
 // DO NOT REMOVE THIS LINE :)
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
